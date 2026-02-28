@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 const WHATSAPP_NUMBER = "5538997316598"; // 55 + 38 + 99731-6598
 const INSTAGRAM_URL = "https://instagram.com/loja_storeoliver";
@@ -61,35 +62,34 @@ export default function Home() {
 
   <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
     
-    <a href="/catalogo/camisetas" className="group relative rounded-2xl overflow-hidden border border-white/10">
-      <img src="/categorias/camisetas.jpeg" className="w-full h-40 object-cover opacity-80 group-hover:opacity-100 transition"/>
+<Link href="/catalogo/camisetas" className="group relative rounded-2xl overflow-hidden border border-white/10">      <img src="/categorias/camisetas.jpeg" className="w-full h-40 object-cover opacity-80 group-hover:opacity-100 transition"/>
       <span className="absolute bottom-3 left-3 font-semibold">Camisetas</span>
-    </a>
+    </Link>
 
-    <a href="/catalogo/camisas" className="group relative rounded-2xl overflow-hidden border border-white/10">
+    <Link href="/catalogo/camisas" className="group relative rounded-2xl overflow-hidden border border-white/10">
       <img src="/categorias/camisas.jpeg" className="w-full h-40 object-cover opacity-80 group-hover:opacity-100 transition"/>
       <span className="absolute bottom-3 left-3 font-semibold">Camisas</span>
-    </a>
+    </Link>
 
-    <a href="/catalogo/bermudas" className="group relative rounded-2xl overflow-hidden border border-white/10">
+    <Link href="/catalogo/bermudas" className="group relative rounded-2xl overflow-hidden border border-white/10">
       <img src="/categorias/bermudas.jpeg" className="w-full h-40 object-cover opacity-80 group-hover:opacity-100 transition"/>
       <span className="absolute bottom-3 left-3 font-semibold">Bermudas</span>
-    </a>
+    </Link>
 
-    <a href="/catalogo/shorts" className="group relative rounded-2xl overflow-hidden border border-white/10">
+    <Link href="/catalogo/shorts" className="group relative rounded-2xl overflow-hidden border border-white/10">
       <img src="/categorias/shorts.jpeg" className="w-full h-40 object-cover opacity-80 group-hover:opacity-100 transition"/>
       <span className="absolute bottom-3 left-3 font-semibold">Shorts</span>
-    </a>
+    </Link>
 
   </div>
 </section>
 <div className="mt-8">
-  <a
+  <Link
     href="/catalogo"
     className="inline-flex items-center justify-center rounded-2xl px-6 py-4 font-semibold bg-white text-black hover:opacity-90 transition"
   >
     Ver catálogo completo
-  </a>
+  </Link>
 </div>
     </main>
     </>

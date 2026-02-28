@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PRODUCTS } from "../../../data/products";
+import { TrackLink } from "../../../components/TrackLink";
 
 const WHATSAPP_NUMBER = "5538997316598";
 
@@ -112,14 +113,22 @@ export default async function ProdutoPage({
             </div>
 
             <div className="mt-6 flex flex-col gap-3">
-              <a
-                href={buildWhatsappLink({ name: product.name, id: product.id })}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-2xl px-5 py-4 font-semibold bg-[#25D366] text-black hover:brightness-110 transition"
-              >
-                Comprar no WhatsApp
-              </a>
+              <TrackLink
+  href={buildWhatsappLink({ name: product.name, id: product.id })}
+  target="_blank"
+  rel="noreferrer"
+  eventName="click_whatsapp"
+  eventParams={{
+    page: "produto",
+    slug: product.slug,
+    product_id: product.id,
+    product_name: product.name,
+    category: product.category,
+  }}
+  className="inline-flex items-center justify-center rounded-2xl px-5 py-4 font-semibold bg-[#25D366] text-black hover:brightness-110 transition"
+>
+  Comprar no WhatsApp
+</TrackLink>
 
               <Link
                 href="/catalogo"
