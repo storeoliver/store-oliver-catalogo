@@ -20,12 +20,25 @@ function buildWhatsappLink(opts: { name: string; id: string; size?: string }) {
 
 export default async function CategoriaPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ categoria: string }>;
+  searchParams?: Promise<{ size?: string }>;
 }) {
   const { categoria } = await params;
+  const sp = searchParams ? await searchParams : {};
+
+  const SIZES = ["P", "M", "G", "GG"] as const;
+  type Size = (typeof SIZES)[number];
+
+  const selectedSizeRaw = (sp.size || "").toUpperCase();
+  const selectedSize: Size | "" =
+    SIZES.includes(selectedSizeRaw as Size) ? (selectedSizeRaw as Size) : "";
 
   const items = PRODUCTS.filter((p) => p.category === categoria);
+
+  const filteredItems =
+    selectedSize === "" ? items : items.filter((p) => p.sizes.includes(selectedSize));
 
   return (
     <main className="min-h-screen bg-black text-white relative overflow-hidden">
@@ -69,14 +82,41 @@ export default async function CategoriaPage({
           <h1 className="text-2xl sm:text-3xl font-semibold capitalize">
             {categoria ? categoria.replaceAll("-", " ") : "categoria"}
           </h1>
+
           <p className="mt-2 opacity-80">
-            {items.length > 0
-              ? `Encontramos ${items.length} produto(s) nesta categoria.`
+            {filteredItems.length > 0
+              ? `Encontramos ${filteredItems.length} produto(s) nesta categoria.`
               : "Ainda não há produtos cadastrados nessa categoria."}
           </p>
 
+          {/* Filtros por tamanho */}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href={`/catalogo/${categoria}`}
+              className={`px-4 py-2 rounded-xl border ${
+                selectedSize === "" ? "bg-white text-black" : "border-white/20"
+              }`}
+            >
+              Todos
+            </Link>
+
+            {SIZES.map((size) => (
+              <Link
+                key={size}
+                href={`/catalogo/${categoria}?size=${size}`}
+                className={`px-4 py-2 rounded-xl border ${
+                  selectedSize === size
+                    ? "bg-white text-black"
+                    : "border-white/20"
+                }`}
+              >
+                {size}
+              </Link>
+            ))}
+          </div>
+
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {items.map((p) => (
+            {filteredItems.map((p) => (
               <div
                 key={p.id}
                 className="overflow-hidden rounded-3xl border border-white/10 bg-white/5"
@@ -108,7 +148,11 @@ export default async function CategoriaPage({
                       {p.sizes.map((s) => (
                         <a
                           key={s}
-                          href={buildWhatsappLink({ name: p.name, id: p.id, size: s })}
+                          href={buildWhatsappLink({
+                            name: p.name,
+                            id: p.id,
+                            size: s,
+                          })}
                           target="_blank"
                           rel="noreferrer"
                           className="rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm hover:bg-black/60 transition"

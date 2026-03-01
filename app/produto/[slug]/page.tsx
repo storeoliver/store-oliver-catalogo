@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PRODUCTS } from "../../../data/products";
-import { TrackLink } from "../../../components/TrackLink";
 
 const WHATSAPP_NUMBER = "5538997316598";
 
@@ -15,24 +14,35 @@ function buildWhatsappLink(opts: { name: string; id: string; size?: string }) {
   const text = encodeURIComponent(
     `Olá! Vim pelo catálogo da STORE OLIVER.\nProduto: ${name}\nRef: ${id}${
       size ? `\nTamanho: ${size}` : ""
-    }\n\nPode me passar disponibilidade e prazo de entrega?`
+    }`
   );
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
 }
 
 export default async function ProdutoPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ size?: string }>;
 }) {
   const { slug } = await params;
+  const sp = searchParams ? await searchParams : undefined;
+
+  const selectedSize = (sp?.size || "").toUpperCase();
 
   const product = PRODUCTS.find((p) => p.slug === slug);
   if (!product) return notFound();
 
+  const SIZES = ["P", "M", "G", "GG"] as const;
+  type Size = (typeof SIZES)[number];
+
+  const normalizedSize: Size | "" =
+    SIZES.includes(selectedSize as Size) ? (selectedSize as Size) : "";
+
   return (
     <main className="min-h-screen bg-black text-white relative overflow-hidden">
-      {/* watermark */}
+      {/* marca d'água */}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-10">
         <div className="w-[320px] sm:w-[420px] md:w-[520px]">
           <Image
@@ -45,7 +55,7 @@ export default async function ProdutoPage({
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-5xl px-5 py-10">
+      <div className="relative z-10 mx-auto max-w-6xl px-5 py-10">
         <header className="flex items-center justify-between gap-4">
           <Link
             href={`/catalogo/${product.category}`}
@@ -72,74 +82,87 @@ export default async function ProdutoPage({
           <div className="w-14" />
         </header>
 
-        <section className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <section className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* imagem */}
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
-            <div className="relative h-[420px] w-full bg-black/40">
+            <div className="relative aspect-[4/5] w-full bg-black/40">
               <Image
                 src={product.image}
                 alt={product.name}
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
               />
             </div>
           </div>
 
-          {/* infos */}
+          {/* conteúdo */}
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <h1 className="text-3xl font-semibold">{product.name}</h1>
-
-            <div className="mt-2 flex items-center justify-between gap-3">
-              <div className="text-sm opacity-70">Ref: {product.id}</div>
-              <div className="text-2xl font-semibold">{formatBRL(product.price)}</div>
-            </div>
-
-            <div className="mt-6">
-              <div className="text-sm opacity-70">Escolha o tamanho</div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {product.sizes.map((s) => (
-                  <a
-                    key={s}
-                    href={buildWhatsappLink({ name: product.name, id: product.id, size: s })}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-sm font-semibold hover:bg-black/60 transition"
-                  >
-                    {s}
-                  </a>
-                ))}
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-semibold">
+                  {product.name}
+                </h1>
+                <div className="mt-2 text-sm opacity-75">Ref: {product.id}</div>
+                <div className="mt-1 text-sm opacity-75 capitalize">
+                  Categoria: {product.category.replaceAll("-", " ")}
+                </div>
+              </div>
+              <div className="text-2xl font-semibold">
+                {formatBRL(product.price)}
               </div>
             </div>
 
-            <div className="mt-6 flex flex-col gap-3">
-              <TrackLink
-  href={buildWhatsappLink({ name: product.name, id: product.id })}
-  target="_blank"
-  rel="noreferrer"
-  eventName="click_whatsapp"
-  eventParams={{
-    page: "produto",
-    slug: product.slug,
-    product_id: product.id,
-    product_name: product.name,
-    category: product.category,
-  }}
-  className="inline-flex items-center justify-center rounded-2xl px-5 py-4 font-semibold bg-[#25D366] text-black hover:brightness-110 transition"
->
-  Comprar no WhatsApp
-</TrackLink>
+            <div className="mt-6">
+              <div className="text-sm opacity-70">
+                Tamanhos {normalizedSize ? `(selecionado: ${normalizedSize})` : ""}
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                {product.sizes.map((s) => {
+                  const isActive = normalizedSize === s;
+                  return (
+                    <Link
+                      key={s}
+                      href={`/produto/${product.slug}?size=${s}`}
+                      className={`rounded-xl border px-3 py-2 text-sm transition ${
+                        isActive
+                          ? "border-white/40 bg-white/15"
+                          : "border-white/15 bg-black/40 hover:bg-black/60"
+                      }`}
+                    >
+                      {s}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-7 flex flex-col gap-3">
+              <a
+                href={buildWhatsappLink({
+                  name: product.name,
+                  id: product.id,
+                  size: normalizedSize || undefined,
+                })}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold bg-[#25D366] text-black hover:brightness-110 transition"
+              >
+                Comprar no WhatsApp
+              </a>
 
               <Link
-                href="/catalogo"
-                className="inline-flex items-center justify-center rounded-2xl px-5 py-4 font-semibold border border-white/15 bg-black/40 hover:bg-black/55 transition"
+                href={`/catalogo/${product.category}`}
+                className="inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold border border-white/15 bg-black/40 hover:bg-black/55 transition"
               >
-                Voltar ao catálogo
+                Ver mais da categoria
               </Link>
             </div>
 
-            <div className="mt-6 text-xs opacity-60">
-              Dica operacional: ao clicar no tamanho, a mensagem já vai com produto + ref + tamanho.
+            <div className="mt-6 text-xs opacity-70">
+              Dica: selecione um tamanho para o WhatsApp já ir com o pedido completo.
             </div>
           </div>
         </section>

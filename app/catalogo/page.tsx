@@ -1,20 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
+import { PRODUCTS } from "../../data/products";
 
-const CATEGORIES = [
-  { title: "Camisetas", slug: "camisetas", badge: "" },
-  { title: "Polos", slug: "polos", badge: "" },
-  { title: "Camisas", slug: "camisas", badge: "" },
-  { title: "Calças", slug: "calcas", badge: "" },
-  { title: "Bermudas", slug: "bermudas", badge: "" },
-  { title: "Shorts", slug: "shorts", badge: "" },
-  { title: "Cuecas", slug: "cuecas", badge: "" },
-  { title: "Lançamentos", slug: "lancamentos", badge: "NEW" },
-  { title: "Promoções", slug: "promocoes", badge: "OFF" },
-  { title: "Últimas Peças", slug: "ultimas-pecas", badge: "🔥" },
-];
+const SIZES = ["P", "M", "G", "GG"] as const;
+
+function titleize(slug: string) {
+  return slug
+    .replaceAll("-", " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 export default function CatalogoPage() {
+  // categorias únicas a partir dos produtos
+  const categories = Array.from(new Set(PRODUCTS.map((p) => p.category)));
+
   return (
     <main className="min-h-screen bg-black text-white relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-10">
@@ -31,10 +30,6 @@ export default function CatalogoPage() {
 
       <div className="relative z-10 mx-auto max-w-5xl px-5 py-10">
         <header className="flex items-center justify-between gap-4">
-          <Link href="/" className="opacity-80 hover:opacity-100">
-            ← Voltar
-          </Link>
-
           <div className="flex items-center gap-3">
             <Image
               src="/brand/logo.jpeg"
@@ -50,36 +45,54 @@ export default function CatalogoPage() {
             </div>
           </div>
 
-          <div className="w-14" />
+          <div className="opacity-80 text-sm">Selecione uma categoria</div>
         </header>
 
         <section className="mt-8">
-          <h1 className="text-2xl sm:text-3xl font-semibold">Categorias</h1>
-          <p className="mt-2 opacity-80">
-            Escolha uma categoria para visualizar os produtos.
-          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {categories.map((cat) => {
+              const count = PRODUCTS.filter((p) => p.category === cat).length;
 
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {CATEGORIES.map((c) => (
-              <Link
-                key={c.slug}
-                href={`/catalogo/${c.slug}`}
-                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 hover:bg-white/10 transition"
-              >
-                {c.badge ? (
-                  <div className="absolute right-4 top-4 rounded-full border border-white/15 bg-black/60 px-3 py-1 text-xs font-semibold">
-                    {c.badge}
+              return (
+                <div
+                  key={cat}
+                  className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-lg font-semibold">
+                        {titleize(cat)}
+                      </div>
+                      <div className="mt-1 text-sm opacity-70">
+                        {count} produto(s)
+                      </div>
+                    </div>
+
+                    <Link
+                      href={`/catalogo/${cat}`}
+                      className="rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm hover:bg-black/60 transition"
+                    >
+                      Ver tudo
+                    </Link>
                   </div>
-                ) : null}
 
-                <div className="mt-12">
-                  <div className="text-lg font-semibold">{c.title}</div>
-                  <div className="mt-1 text-sm opacity-70">Ver produtos →</div>
+                  <div className="mt-4">
+                    <div className="text-sm opacity-70">Filtrar por tamanho</div>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {SIZES.map((size) => (
+                        <Link
+                          key={size}
+                          href={`/catalogo/${cat}?size=${size}`}
+                          className="rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm hover:bg-black/60 transition"
+                        >
+                          {size}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-
-                <div className="pointer-events-none absolute -bottom-10 -right-10 h-36 w-36 rounded-full bg-white/10 blur-2xl group-hover:bg-white/20 transition" />
-              </Link>
-            ))}
+              );
+            })}
           </div>
         </section>
       </div>
