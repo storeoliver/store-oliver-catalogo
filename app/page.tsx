@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { MessageCircle, Instagram, Phone } from "lucide-react";
 
-const WHATSAPP_URL = "https://wa.me/5538997316598";
+const WHATSAPP_URL = "https://wa.me/5538997316598?text=Olá! Vim pelo catálogo da STORE OLIVER e gostaria de ver os produtos disponíveis.";
 const INSTAGRAM_URL = "https://instagram.com/loja_storeoliver";
 
 const SIZES = ["P", "M", "G", "GG"] as const;
@@ -23,15 +23,8 @@ const PRODUCTS: Product[] = [
 ];
 
 const HOME_CARDS: HomeCard[] = [
-  { title: "Lançamentos 🔥", slug: "new", kind: "tag", tag: "new" },
-  { title: "Promoções 🔥", slug: "promo", kind: "tag", tag: "promo" },
   { title: "Camisetas", slug: "camisetas", kind: "category" },
-  { title: "Camisas", slug: "camisas", kind: "category" },
-  { title: "Gola Polo", slug: "gola-polo", kind: "category" },
-  { title: "Bermudas", slug: "bermudas", kind: "category" },
-  { title: "Calças", slug: "calcas", kind: "category" },
   { title: "Shorts", slug: "shorts", kind: "category" },
-  { title: "Cuecas", slug: "cuecas", kind: "category" },
 ];
 
 export default function Home() {
@@ -50,7 +43,7 @@ export default function Home() {
               href={WHATSAPP_URL}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 py-3 font-semibold text-black"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 py-3 font-semibold text-white"
             >
               <MessageCircle size={18} />
               Comprar no WhatsApp
@@ -121,21 +114,23 @@ export default function Home() {
 
                 {/* tamanhos */}
                 <div className="mt-2 grid grid-cols-4 gap-2">
-                  {SIZES.map((size) => {
-                    const href = `${baseLink}${
-                      baseLink.includes("?") ? "&" : "?"
-                    }size=${size}`;
+                  {(
+  card.slug === "calcas" || card.slug === "bermudas"
+    ? ["36", "38", "40", "42", "44", "46", "48"]
+    : ["P", "M", "G", "GG"]
+).map((size) => {
+  const href = `${baseLink}${baseLink.includes("?") ? "&" : "?"}size=${size}`;
 
-                    return (
-                      <Link
-                        key={size}
-                        href={href}
-                        className="rounded-lg border border-white/15 px-2 py-1 text-center text-xs hover:bg-white/10"
-                      >
-                        {size}
-                      </Link>
-                    );
-                  })}
+  return (
+    <Link
+      key={size}
+      href={href}
+      className="rounded-lg border border-white/15 px-2 py-[3px] text-center text-xs hover:bg-white/10"
+    >
+      {size}
+    </Link>
+  );
+})}
                 </div>
               </div>
             );
@@ -157,7 +152,7 @@ export default function Home() {
     href={WHATSAPP_URL}
     target="_blank"
     rel="noreferrer"
-    className="mt-6 inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-6 py-4 font-semibold text-black hover:opacity-90 transition"
+    className="mt-6 inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-6 py-4 font-semibold text-white hover:opacity-90 transition"
   >
     <MessageCircle size={18} />
     Falar no WhatsApp
@@ -176,10 +171,10 @@ export default function Home() {
 
       <div className="flex flex-row gap-3 w-full sm:w-auto">
         <a
-          href={WHATSAPP_URL}
+          href="https://wa.me/5538997316598?text=Olá! Gostaria de tirar uma dúvida sobre os produtos da STORE OLIVER."
           target="_blank"
           rel="noreferrer"
-          className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-5 py-3 font-semibold text-black hover:opacity-90 transition"
+          className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-5 py-3 font-semibold text-white hover:opacity-90 transition"
         >
           <MessageCircle size={18} />
           WhatsApp

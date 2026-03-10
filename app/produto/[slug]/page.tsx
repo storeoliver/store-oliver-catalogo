@@ -1,172 +1,86 @@
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PRODUCTS } from "../../../data/products";
+import { getProducts } from "@/data/catalog";
 
-const WHATSAPP_NUMBER = "5538997316598";
+type PageProps = {
+  params: Promise<{
+    slug: string;
+  }>;
+};
 
-function formatBRL(value: number) {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-function buildWhatsappLink(opts: { name: string; id: string; size?: string }) {
-  const { name, id, size } = opts;
-  const text = encodeURIComponent(
-    `Olá! Vim pelo catálogo da STORE OLIVER.\nProduto: ${name}\nRef: ${id}${
-      size ? `\nTamanho: ${size}` : ""
-    }`
-  );
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
-}
-
-export default async function ProdutoPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ size?: string }>;
-}) {
+export default async function Produto({ params }: PageProps) {
   const { slug } = await params;
-  const sp = searchParams ? await searchParams : undefined;
+const slugDecodificado = decodeURIComponent(slug);
 
-  const selectedSize = (sp?.size || "").toUpperCase();
+const products = getProducts();
+const produto = products.find((p) => p.sku === slugDecodificado);
+const index = products.findIndex((p) => p.sku === slugDecodificado);
 
-  const product = PRODUCTS.find((p) => p.slug === slug);
-  if (!product) return notFound();
+const prev = index > 0 ? products[index - 1] : null
+const next = index < products.length - 1 ? products[index + 1] : null
 
-  const SIZES = ["P", "M", "G", "GG"] as const;
-  type Size = (typeof SIZES)[number];
+  if (!produto) {
+    notFound();
+  }
 
-  const normalizedSize: Size | "" =
-    SIZES.includes(selectedSize as Size) ? (selectedSize as Size) : "";
+  const whatsappHref = `https://wa.me/5538997316598?text=${encodeURIComponent(
+    `Olá, tenho interesse no produto ${produto.sku}`
+  )}`;
 
   return (
-    <main className="min-h-screen bg-black text-white relative overflow-hidden">
-      {/* marca d'água */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-10">
-        <div className="w-[320px] sm:w-[420px] md:w-[520px]">
-          <Image
-            src="/brand/logo.jpeg"
-            alt="STORE OLIVER"
-            width={1200}
-            height={1200}
-            priority
-          />
-        </div>
-      </div>
+    <main className="h-screen bg-black px-4 py-3 text-white flex flex-col items-center justify-center">
+        <a
+  href={`/catalogo/${produto.category}`}
+  className="absolute top-4 left-4 text-sm text-white opacity-70 hover:opacity-100"
+>
+  ← Voltar
+</a>
+      <h1 className="mb-2 text-xl font-semibold text-center">{produto.name}</h1>
+<p className="mb-2 text-xs opacity-60">Código: {produto.sku}</p>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-5 py-10">
-        <header className="flex items-center justify-between gap-4">
-          <Link
-            href={`/catalogo/${product.category}`}
-            className="opacity-80 hover:opacity-100"
-          >
-            ← Voltar
-          </Link>
+      <img
+        src={produto.image}
+        alt={produto.sku}
+        className="mb-2 w-full max-w-[220px] md:max-w-[240px] rounded-xl"
+      />
 
-          <div className="flex items-center gap-3">
-            <Image
-              src="/brand/logo.jpeg"
-              alt="STORE OLIVER"
-              width={120}
-              height={120}
-              className="h-10 w-auto"
-              priority
-            />
-            <div className="leading-tight">
-              <div className="text-sm opacity-80">Produto</div>
-              <div className="font-semibold tracking-wide">STORE OLIVER</div>
-            </div>
-          </div>
+      <p className="mb-1 text-sm">Categoria: {produto.category}</p>
 
-          <div className="w-14" />
-        </header>
+      <p className="mb-1 text-sm">
+        Tamanhos disponíveis: {produto.sizes.join(", ")}
+      </p>
 
-        <section className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* imagem */}
-          <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
-            <div className="relative aspect-[4/5] w-full bg-black/40">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-              />
-            </div>
-          </div>
+      <p className="mb-2 text-sm">Consulte preço</p>
 
-          {/* conteúdo */}
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-semibold">
-                  {product.name}
-                </h1>
-                <div className="mt-2 text-sm opacity-75">Ref: {product.id}</div>
-                <div className="mt-1 text-sm opacity-75 capitalize">
-                  Categoria: {product.category.replaceAll("-", " ")}
-                </div>
-              </div>
-              <div className="text-2xl font-semibold">
-                {formatBRL(product.price)}
-              </div>
-            </div>
+      <a
+        href={whatsappHref}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-block rounded-xl bg-[#25D366] px-6 py-2 font-semibold text-black mt-2"
+      >
+        Comprar no WhatsApp
+        </a>
+        
+        <div className="flex gap-6 mt-6 text-sm">
 
-            <div className="mt-6">
-              <div className="text-sm opacity-70">
-                Tamanhos {normalizedSize ? `(selecionado: ${normalizedSize})` : ""}
-              </div>
+  {prev && (
+    <a
+      href={`/produto/${encodeURIComponent(prev.sku)}`}
+      className="text-white opacity-70 hover:opacity-100"
+    >
+      ← Produto anterior
+    </a>
+  )}
 
-              <div className="mt-3 flex flex-wrap gap-2">
-                {product.sizes.map((s) => {
-                  const isActive = normalizedSize === s;
-                  return (
-                    <Link
-                      key={s}
-                      href={`/produto/${product.slug}?size=${s}`}
-                      className={`rounded-xl border px-3 py-2 text-sm transition ${
-                        isActive
-                          ? "border-white/40 bg-white/15"
-                          : "border-white/15 bg-black/40 hover:bg-black/60"
-                      }`}
-                    >
-                      {s}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
+  {next && (
+    <a
+      href={`/produto/${encodeURIComponent(next.sku)}`}
+      className="text-white opacity-70 hover:opacity-100"
+    >
+      Próximo produto →
+    </a>
+  )}
 
-            <div className="mt-7 flex flex-col gap-3">
-              <a
-                href={buildWhatsappLink({
-                  name: product.name,
-                  id: product.id,
-                  size: normalizedSize || undefined,
-                })}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold bg-[#25D366] text-black hover:brightness-110 transition"
-              >
-                Comprar no WhatsApp
-              </a>
-
-              <Link
-                href={`/catalogo/${product.category}`}
-                className="inline-flex items-center justify-center rounded-2xl px-5 py-3 font-semibold border border-white/15 bg-black/40 hover:bg-black/55 transition"
-              >
-                Ver mais da categoria
-              </Link>
-            </div>
-
-            <div className="mt-6 text-xs opacity-70">
-              Dica: selecione um tamanho para o WhatsApp já ir com o pedido completo.
-            </div>
-          </div>
-        </section>
-      </div>
+</div>
     </main>
   );
 }

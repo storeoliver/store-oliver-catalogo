@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PRODUCTS } from "../../data/products";
+import { getProducts } from "@/data/catalog";
 
 const SIZES = ["P", "M", "G", "GG"] as const;
 
@@ -11,8 +12,12 @@ function titleize(slug: string) {
 }
 
 export default function CatalogoPage() {
+  const allProductsFromFolders = getProducts();
+console.log("PRODUTOS LIDOS:", allProductsFromFolders);
+
   // categorias únicas a partir dos produtos
-  const categories = Array.from(new Set(PRODUCTS.map((p) => p.category)));
+  const allProducts = getProducts();
+const categories = Array.from(new Set(allProducts.map((p) => p.category)));
 
   return (
     <main className="min-h-screen bg-black text-white relative overflow-hidden">
@@ -51,7 +56,7 @@ export default function CatalogoPage() {
         <section className="mt-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {categories.map((cat) => {
-              const count = PRODUCTS.filter((p) => p.category === cat).length;
+              const count = allProducts.filter((p) => p.category === cat).length;
 
               return (
                 <div
