@@ -151,7 +151,7 @@ console.log("ITEMS FILTRADOS:", items);
     ? 79.99
     : categoria === "shorts"
     ? 89.99
-    : categoria === "polo"
+    : categoria === "gola polo"
     ? 119.99
     : categoria === "cuecas"
     ? 29.99
