@@ -24,8 +24,10 @@ const PRODUCTS: Product[] = [
 
 const HOME_CARDS: HomeCard[] = [
   { title: "Camisetas", slug: "camisetas", kind: "category" },
-  { title: "Shorts", slug: "shorts", kind: "category" },
   { title: "Gola Polo", slug: "gola-polo", kind: "category" },
+  { title: "Shorts", slug: "shorts", kind: "category" },
+    { title: "Cuecas", slug: "cuecas", kind: "category" },
+
 
 ];
 
